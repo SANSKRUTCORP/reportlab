@@ -56,6 +56,7 @@ from struct import pack, unpack, error as structError
 from reportlab.lib.utils import getStringIO
 from reportlab.pdfbase import pdfmetrics, pdfdoc
 from reportlab import rl_config
+import cloudstorage as gcs
 
 class TTFError(pdfdoc.PDFError):
     "TrueType font exception"
@@ -260,9 +261,11 @@ class TTFontParser:
         if hasattr(f,'read'):
             self.filename = '(ttf)'
         else:
-            self.filename, f = TTFOpenFile(f)
-
-        self._ttf_data = f.read()
+            self.filename = f
+            gcs_file = gcs.open(f)
+            self._ttf_data = gcs_file.read()
+            gcs_file.close()
+            
         self._pos = 0
 
     def checksumTables(self):
